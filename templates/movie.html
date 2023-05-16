@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title></title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+      integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="jquery-3.6.4.min.js"></script>
+    <script src="" async defer></script>
+  </head>
+  <body>
+    <div id="cardMain">
+      <div class="card-deck">
+        <div class="container">
+          <nav class="navbar navbar-light bg-light">
+            <form class="form-inline">
+              <input
+                class="form-control mr-sm-2"
+                type="text"
+                id="search"
+                placeholder="Search"
+                aria-label="Search"
+              />
+            </form>
+          </nav>
+          <div class="row mt-3" id="movie-card"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      $(document).ready(function () {
+        getMovies();
+      });
+
+      $("#search").keyup(function () {
+        var delay = 1000;
+        setTimeout(searchMovies, delay);
+      });
+
+      function getMovies() {
+        $.ajax({
+          url: "https://6452256ebce0b0a0f73dc643.mockapi.io/api/v1/movie",
+          type: "GET",
+          success: function (response) {
+            response.map((response) => {
+              $("#movie-card").append(`
+                <div class="col-sm-3 col-lg-3 col-md-3">
+                    <div class="card" id=${response.id} onclick="movieDetails(${response.id})">
+                        <img src=${response.avatar} class="card-img-top" alt="..." width="200" height="200">
+                        <div class="card-body">
+                            <h5 class="card-title">${response.name}</h5>
+                            <p class="card-text"></p>
+                        </div>
+                    </div>
+                </div>`);
+            });
+          },
+        });
+      }
+
+      function searchMovies() {
+        const searchTerm = $("#search").val().trim().toLowerCase();
+        console.log("searchTerm::::", `----${searchTerm}-----`);
+        if (searchTerm) {
+          $.ajax({
+            url: "https://6452256ebce0b0a0f73dc643.mockapi.io/api/v1/movie",
+            type: "GET",
+            success: function (response) {
+              const filteredMovies = response.filter((movie) =>
+                movie.name.toLowerCase().includes(searchTerm)
+              );
+              console.log(filteredMovies);
+              $("#movie-card").empty();
+              filteredMovies.map((movie) => {
+                $("#movie-card").append(
+                  `<div class="col-sm-12 col-md-3 col-lg-3">
+                  <div class="card" id=${movie.id}  onclick="movieDetails(${movie.id})">
+                      <img src=${movie.avatar} class="card-img-top" alt="...">
+                      <div class="card-body">
+                        <h5 class="card-title">${movie.name}</h5>
+                        <p class="card-text"></p>
+                      </div>
+                  </div>
+                </div>`
+                );
+              });
+            },
+          });
+        }
+      }
+
+      function movieDetails(id) {
+        window.location.href = `/info?id=${id}`;
+      }
+    </script>
+  </body>
+</html>
